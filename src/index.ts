@@ -1,1 +1,6 @@
-export const greet = (name: string) => `Hello ${name}`;
+import { qpress } from './express';
+import 'reflect-metadata';
+
+export * from './express/index';
+export * from './decorators/index';
+export default qpress;

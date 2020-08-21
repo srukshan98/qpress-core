@@ -68,3 +68,4 @@ typings/
 .sonarlint/
 
 .idea/
+package-lock.json
