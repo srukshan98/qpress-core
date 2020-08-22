@@ -1,6 +1,6 @@
 {
   "name": "@qpress/core",
-  "version": "0.0.1",
+  "version": "0.0.1-development",
   "description": "A Quick Express Controller Server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
