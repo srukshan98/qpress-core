@@ -34,7 +34,8 @@ export function RequestMapping(
         const decorator: Decorator = new RequestMappingDecorator(
             path,
             type,
-            method
+            method,
+            descriptor.value
         );
         if (target.constructor.prototype.decorators != null) {
             target.constructor.prototype.decorators.push(decorator);
