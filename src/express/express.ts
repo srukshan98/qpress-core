@@ -6,7 +6,7 @@ import { NullModuleDecoratorException } from '../exceptions/decorators/null-modu
 import { Server } from 'http';
 import { Socket } from 'dgram';
 export class QExpress {
-  server: Server | null = null;
+    server: Server | null = null;
     constructor(public express: Express) {}
 
     attachModule(module: Function): void {
@@ -22,7 +22,6 @@ export class QExpress {
 
         decoratorHandler.processDecorators();
         print.info(module.name, 'was successfully attached');
-
     }
 
     runApp(port = process.env.PORT || 3000): void {
@@ -32,7 +31,9 @@ export class QExpress {
             );
         });
         // this.server.on("listening", print.log)
-        this.server.on("connection", (socket: Socket) => print.info(socket.address()))
+        this.server.on('connection', (socket: Socket) =>
+            print.info(socket.address())
+        );
         // this.server.on("error", print.log)
         // this.server.on("close", print.log)
         // const readline = require('readline');
