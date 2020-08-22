@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/srukshan98/qpress.git"
+    "url": "git://github.com/srukshan98/qpress-core.git"
   },
   "keywords": [
     "express",
