@@ -1,7 +1,7 @@
 export class DecoratorException extends Error {
-    name = 'DecoratorException';
+	name = 'DecoratorException';
 
-    constructor(public message: string) {
-        super(message);
-    }
+	constructor(public message: string) {
+		super(message);
+	}
 }

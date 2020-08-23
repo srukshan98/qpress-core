@@ -1,5 +1,5 @@
 export enum LogLevelType {
-    Verbose,
-    Minimal,
-    None,
+	Verbose,
+	Minimal,
+	None,
 }

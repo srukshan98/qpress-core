@@ -1,4 +1,5 @@
 export interface ModuleModel {
-    imports?: Function[];
-    controllers?: Function[];
+	imports?: Function[];
+	controllers?: Function[];
+	middlewares?: Function[];
 }
