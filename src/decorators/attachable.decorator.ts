@@ -2,7 +2,6 @@ import { AttachableDecorator } from './models/attachable.model';
 import { ClassDecorator } from './types/decorator.type';
 import { NullMiddlewareException } from '../exceptions/decorators/null-middleware.exception';
 import { Decorator } from './models/decorator.model';
-import { Middleware } from './models/middleware.model';
 
 /**
  *Attachable Decorator For Middleware
@@ -10,7 +9,7 @@ import { Middleware } from './models/middleware.model';
  */
 export function Attachable(): ClassDecorator {
 	return function (constructor: Function): void {
-		if (!(constructor.prototype instanceof Middleware)) {
+		if (!constructor.prototype.middleware) {
 			throw new NullMiddlewareException();
 		}
 

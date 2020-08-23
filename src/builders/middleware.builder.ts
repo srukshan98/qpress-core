@@ -8,11 +8,9 @@ type MiddlewareFunction = (
 	next: NextFunction
 ) => void;
 
-export class MiddlewareBuilder extends Middleware {
+export class MiddlewareBuilder implements Middleware {
 	decorators = [new AttachableDecorator()];
-	private constructor(public middleware: MiddlewareFunction) {
-		super();
-	}
+	private constructor(public middleware: MiddlewareFunction) {}
 
 	static build(middlewareFunction: MiddlewareFunction): Function {
 		function CustomMiddleware() {}
