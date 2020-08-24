@@ -26,9 +26,7 @@ export class QExpress {
 
 	runApp(port = process.env.PORT || 3000): void {
 		this.server = this.express.listen(port, () => {
-			print.info(
-				`Quick Express Server is running in http://localhost:${port}`
-			);
+			print.info(`Quick Express Server is running in http://localhost:${port}`);
 		});
 		// this.server.on("listening", print.log)
 		this.server.on('connection', (socket: Socket) =>

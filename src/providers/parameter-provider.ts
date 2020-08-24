@@ -24,8 +24,7 @@ function GetParms(
 	const methodParms: string[] = GetParameters(method);
 	const urlQueryParms: RegExpMatchArray | null = path.match(/(?<=:)(\w)*/g);
 	const decParms: ParmTypes[] =
-		Reflect.getOwnMetadata(MetadataConfig.request, target, methodName) ||
-		[];
+		Reflect.getOwnMetadata(MetadataConfig.request, target, methodName) || [];
 	const requestParms: any[] = [];
 
 	for (let index = 0; index < methodParms.length; index++) {
