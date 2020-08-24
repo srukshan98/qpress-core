@@ -59,10 +59,11 @@
     "dist/**/*"
   ],
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "reflect-metadata": "^0.1.13",
+    "body-parser": "^1.19.0"
   },
   "peerDependencies": {
-    "body-parser": "^1.19.0",
-    "reflect-metadata": "^0.1.13"
+    "body-parser": "^1.19.0"
   }
 }
