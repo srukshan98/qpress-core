@@ -16,10 +16,13 @@ import { DumpError } from './error.handler';
 import { NullRouteException } from '../exceptions/decorators/null-route.exception';
 import { Middleware } from '../decorators';
 import { NullInjectableException } from '../exceptions/decorators/null-injectable.exception';
-export class DecoratorHandler {
+import { InjectableDecorator } from '../decorators/models/injectable.model';
+export class DecoratorHandler extends Map {
 	private router: Router | undefined;
 
-	constructor(public decorators: Decorator[], private module: Function) {}
+	constructor(public decorators: Decorator[], private module: Function) {
+		super();
+	}
 
 	attachRouter(router?: Router): void {
 		this.router = router;
@@ -43,6 +46,12 @@ export class DecoratorHandler {
 		) as AttachableDecorator;
 	}
 
+	getInjectable(): InjectableDecorator {
+		return this.decorators.find(
+			(decorator: Decorator) => decorator.type === DecoratorType.Injectable
+		) as InjectableDecorator;
+	}
+
 	getRequestMapping(): RequestMappingDecorator[] {
 		return this.decorators.filter(
 			(decorator: Decorator) => decorator.type === DecoratorType.RequestMapping
@@ -56,6 +65,8 @@ export class DecoratorHandler {
 			return DecoratorType.Route;
 		} else if (this.getMiddleware() != null) {
 			return DecoratorType.Attachable;
+		} else if (this.getInjectable() != null) {
+			return DecoratorType.Injectable;
 		}
 		return null;
 	}
@@ -66,6 +77,7 @@ export class DecoratorHandler {
 		const module: ModuleDecorator = this.getModule();
 		const route: RouteDecorator = this.getRoute();
 		const middleware: AttachableDecorator = this.getMiddleware();
+		const provider: InjectableDecorator = this.getInjectable();
 
 		if (module && route) {
 			this.processModule(module, route.path);
@@ -75,6 +87,8 @@ export class DecoratorHandler {
 			this.processRoute(route);
 		} else if (middleware) {
 			this.processMiddleware();
+		} else if (provider) {
+			this.processProvider();
 		}
 	}
 	processMiddleware(): void {
@@ -90,6 +104,11 @@ export class DecoratorHandler {
 			middleware.middleware.apply(attachable, [req, res, next])
 		);
 	}
+
+	processProvider(): void {
+		console.log('');
+	}
+
 	processModule(module: ModuleDecorator, path?: string): void {
 		const imports: Function[] = module.module.imports ?? [];
 		const controllers: Function[] = module.module.controllers ?? [];
