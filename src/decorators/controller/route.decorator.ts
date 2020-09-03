@@ -19,8 +19,8 @@ export function Route(path: string): ClassDecorator {
 		}
 
 		type T = ConstructorParameters<typeof constructor.prototype>;
-		const test :T = ['string'];
-		console.log(test)
-		console.log(constructor.prototype, typeof constructor.prototype)
+		const test: T = ['string'];
+		console.log(test);
+		console.log(constructor.prototype, typeof constructor.prototype);
 	};
 }
