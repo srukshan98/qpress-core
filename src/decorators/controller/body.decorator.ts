@@ -17,8 +17,7 @@ export function Body(
 	parameterIndex: number
 ): void {
 	const existingRequiredParameters: ParmTypes[] =
-		Reflect.getOwnMetadata(MetadataConfig.request, target, propertyKey) ||
-		[];
+		Reflect.getOwnMetadata(MetadataConfig.request, target, propertyKey) || [];
 	existingRequiredParameters[parameterIndex] = ParmTypes.Body;
 	Reflect.defineMetadata(
 		MetadataConfig.request,

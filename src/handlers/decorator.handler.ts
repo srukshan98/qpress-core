@@ -15,10 +15,14 @@ import { RouteDecorator } from '../decorators/models/route-decorator.model';
 import { DumpError } from './error.handler';
 import { NullRouteException } from '../exceptions/decorators/null-route.exception';
 import { Middleware } from '../decorators';
-export class DecoratorHandler {
+import { NullInjectableException } from '../exceptions/decorators/null-injectable.exception';
+import { InjectableDecorator } from '../decorators/models/injectable.model';
+export class DecoratorHandler extends Map {
 	private router: Router | undefined;
 
-	constructor(public decorators: Decorator[], private module: Function) {}
+	constructor(public decorators: Decorator[], private module: Function) {
+		super();
+	}
 
 	attachRouter(router?: Router): void {
 		this.router = router;
@@ -38,15 +42,19 @@ export class DecoratorHandler {
 
 	getMiddleware(): AttachableDecorator {
 		return this.decorators.find(
-			(decorator: Decorator) =>
-				decorator.type === DecoratorType.Attachable
+			(decorator: Decorator) => decorator.type === DecoratorType.Attachable
 		) as AttachableDecorator;
+	}
+
+	getInjectable(): InjectableDecorator {
+		return this.decorators.find(
+			(decorator: Decorator) => decorator.type === DecoratorType.Injectable
+		) as InjectableDecorator;
 	}
 
 	getRequestMapping(): RequestMappingDecorator[] {
 		return this.decorators.filter(
-			(decorator: Decorator) =>
-				decorator.type === DecoratorType.RequestMapping
+			(decorator: Decorator) => decorator.type === DecoratorType.RequestMapping
 		) as RequestMappingDecorator[];
 	}
 
@@ -57,6 +65,8 @@ export class DecoratorHandler {
 			return DecoratorType.Route;
 		} else if (this.getMiddleware() != null) {
 			return DecoratorType.Attachable;
+		} else if (this.getInjectable() != null) {
+			return DecoratorType.Injectable;
 		}
 		return null;
 	}
@@ -67,6 +77,7 @@ export class DecoratorHandler {
 		const module: ModuleDecorator = this.getModule();
 		const route: RouteDecorator = this.getRoute();
 		const middleware: AttachableDecorator = this.getMiddleware();
+		const provider: InjectableDecorator = this.getInjectable();
 
 		if (module && route) {
 			this.processModule(module, route.path);
@@ -76,6 +87,8 @@ export class DecoratorHandler {
 			this.processRoute(route);
 		} else if (middleware) {
 			this.processMiddleware();
+		} else if (provider) {
+			this.processProvider();
 		}
 	}
 	processMiddleware(): void {
@@ -91,22 +104,44 @@ export class DecoratorHandler {
 			middleware.middleware.apply(attachable, [req, res, next])
 		);
 	}
+
+	processProvider(): void {
+		console.log('');
+	}
+
 	processModule(module: ModuleDecorator, path?: string): void {
 		const imports: Function[] = module.module.imports ?? [];
 		const controllers: Function[] = module.module.controllers ?? [];
 		const middlewares: Function[] = module.module.middlewares ?? [];
+		const providers: Function[] = module.module.providers ?? [];
 
 		imports.length > 0 && print.log(imports.length, 'Imports were found');
 		controllers.length > 0 &&
 			print.log(controllers.length, 'Controllers were found');
 		middlewares.length > 0 &&
 			print.log(middlewares.length, 'Middlewares were found');
+		providers.length > 0 &&
+			print.log(middlewares.length, 'Providers were found');
 
 		let router: Router | null = null;
 		if (path) {
 			print.log('Setting Module Route to ', path);
 			router = Router();
 		}
+
+		providers.forEach((moduleClass) => {
+			const decoratorHandler: DecoratorHandler = DecoratorHandler.fromModule(
+				moduleClass
+			);
+
+			if (decoratorHandler.getType() !== DecoratorType.Injectable) {
+				throw new NullInjectableException();
+			}
+
+			decoratorHandler.attachRouter(router ?? this.router);
+
+			decoratorHandler.processDecorators();
+		});
 
 		middlewares.forEach((moduleClass) => {
 			const decoratorHandler: DecoratorHandler = DecoratorHandler.fromModule(
@@ -167,10 +202,7 @@ export class DecoratorHandler {
 				const parms = mapping.parmMethod(request, response);
 				let methodReponse: { [key: string]: any } | null = null;
 				try {
-					methodReponse = await mapping.method.apply(
-						controller,
-						parms
-					);
+					methodReponse = await mapping.method.apply(controller, parms);
 				} catch (e) {
 					methodReponse = DumpError(e);
 				}

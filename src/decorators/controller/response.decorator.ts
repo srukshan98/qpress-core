@@ -17,8 +17,7 @@ export function Response(
 	parameterIndex: number
 ): void {
 	const existingRequiredParameters: ParmTypes[] =
-		Reflect.getOwnMetadata(MetadataConfig.request, target, propertyKey) ||
-		[];
+		Reflect.getOwnMetadata(MetadataConfig.request, target, propertyKey) || [];
 	existingRequiredParameters[parameterIndex] = ParmTypes.Response;
 	Reflect.defineMetadata(
 		MetadataConfig.request,
