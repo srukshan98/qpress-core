@@ -1,13 +1,14 @@
 import { ClassDecorator } from './types/decorator.type';
 import { Decorator } from './models/decorator.model';
 import { InjectableDecorator } from './models/injectable.model';
+import { ProviderModel } from './models/provider.model';
 /**
  *Injectable Decorator For Providers
  *
  */
-export function Injectable(): ClassDecorator {
+export function Injectable(model: ProviderModel): ClassDecorator {
 	return function (constructor: Function): void {
-		const decorator: Decorator = new InjectableDecorator();
+		const decorator: Decorator = new InjectableDecorator(model);
 		if (constructor.prototype.decorators != null) {
 			constructor.prototype.decorators.push(decorator);
 		} else {

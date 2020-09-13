@@ -9,8 +9,8 @@ export { Injectable } from './injectable.decorator';
 export { Middleware } from './models/middleware.model';
 export { Attachable } from './attachable.decorator';
 export { RequestType } from './types/request.type';
-export {
-	Request as QRequest,
-	Response as QResponse,
-	NextFunction,
-} from 'express';
+export { NextFunction } from 'express';
+export { QRequest } from './models/qrequest.model';
+export { QResponse } from './models/qresponse.model';
+export { Provider } from './models/provider.interface';
+export { ProviderLifeSpan, ProviderModel } from './models/provider.model';

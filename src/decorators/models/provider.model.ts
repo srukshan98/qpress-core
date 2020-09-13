@@ -1,4 +1,9 @@
-import { Decorator } from './decorator.model';
-export interface Provider {
-	decorators?: Decorator[];
+export class ProviderModel {
+	lifeSpan: ProviderLifeSpan = ProviderLifeSpan.Request;
+}
+
+export enum ProviderLifeSpan {
+	Application,
+	Request,
+	Instant,
 }
