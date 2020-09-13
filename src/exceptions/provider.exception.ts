@@ -1,7 +1,9 @@
-export class ProviderException extends Error {
-	name = 'ProviderException';
+export class ProviderTypeNotFoundException extends Error {
+	name = 'ProviderTypeNotFoundException';
 
-	constructor(public message: string) {
-		super(message);
+	constructor(moduleName: string) {
+		super(
+			`Dependency Injection Failed in ${moduleName}. Provider was not found`
+		);
 	}
 }

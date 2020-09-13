@@ -20,7 +20,6 @@ import { NullInjectableException } from '../exceptions/decorators/null-injectabl
 import { InjectableDecorator } from '../decorators/models/injectable.model';
 export class DecoratorHandler extends Map {
 	private router: Router | undefined;
-	private parentProviderHandler: ProviderHandler | undefined;
 	private providerHandler: ProviderHandler | undefined;
 
 	constructor(public decorators: Decorator[], private module: Function) {
@@ -32,7 +31,7 @@ export class DecoratorHandler extends Map {
 	}
 
 	attachProviderHandler(providerHandler?: ProviderHandler): void {
-		this.parentProviderHandler = providerHandler;
+		this.providerHandler = providerHandler;
 	}
 
 	getModule(): ModuleDecorator {
@@ -96,7 +95,7 @@ export class DecoratorHandler extends Map {
 			this.processMiddleware();
 		} else if (provider) {
 			return {
-				provider: provider.type,
+				type: provider.model.lifeSpan,
 				module: this.module,
 			};
 		}
@@ -104,21 +103,22 @@ export class DecoratorHandler extends Map {
 	processMiddleware(): void {
 		const middleware = this.module.prototype;
 		let attachable: Middleware;
-		if (this.parentProviderHandler) {
-			attachable = this.parentProviderHandler.initializeWithProviderInjection(
-				this.module
-			);
-		} else {
-			try {
-				attachable = new middleware.constructor();
-			} catch (_) {
-				attachable = new middleware();
-			}
-		}
 
-		this.router?.use((req: Request, res: Response, next: NextFunction) =>
-			middleware.middleware.apply(attachable, [req, res, next])
-		);
+		this.router?.use((req: Request, res: Response, next: NextFunction) => {
+			if (this.providerHandler) {
+				attachable = this.providerHandler.initializeWithProviderInjection(
+					this.module
+				);
+			} else {
+				try {
+					attachable = new middleware.constructor();
+				} catch (_) {
+					attachable = new middleware();
+				}
+			}
+
+			middleware.middleware.apply(attachable, [req, res, next]);
+		});
 	}
 
 	processModule(module: ModuleDecorator, path?: string): void {
@@ -141,7 +141,7 @@ export class DecoratorHandler extends Map {
 			router = Router();
 		}
 
-		this.providerHandler = new ProviderHandler(this.parentProviderHandler);
+		const providerHandler = new ProviderHandler(this.providerHandler);
 
 		providers.forEach((moduleClass) => {
 			const decoratorHandler: DecoratorHandler = DecoratorHandler.fromModule(
@@ -155,12 +155,12 @@ export class DecoratorHandler extends Map {
 			decoratorHandler.attachRouter(router ?? this.router);
 
 			const provider = decoratorHandler.processDecorators();
-			if (provider && this.providerHandler) {
-				this.providerHandler.addProvider(provider);
+			if (provider && providerHandler) {
+				providerHandler.addProvider(provider);
 			}
 		});
 
-		this.initializeProvidersOnRequest(router ?? this.router);
+		this.initializeProvidersOnRequest(router ?? this.router, providerHandler);
 
 		middlewares.forEach((moduleClass) => {
 			const decoratorHandler: DecoratorHandler = DecoratorHandler.fromModule(
@@ -172,7 +172,7 @@ export class DecoratorHandler extends Map {
 			}
 
 			decoratorHandler.attachRouter(router ?? this.router);
-			decoratorHandler.attachProviderHandler(this.providerHandler);
+			decoratorHandler.attachProviderHandler(providerHandler);
 
 			decoratorHandler.processDecorators();
 		});
@@ -187,7 +187,7 @@ export class DecoratorHandler extends Map {
 			}
 
 			decoratorHandler.attachRouter(router ?? this.router);
-			decoratorHandler.attachProviderHandler(this.providerHandler);
+			decoratorHandler.attachProviderHandler(providerHandler);
 
 			decoratorHandler.processDecorators();
 		});
@@ -201,7 +201,7 @@ export class DecoratorHandler extends Map {
 			}
 
 			decoratorHandler.attachRouter(router ?? this.router);
-			decoratorHandler.attachProviderHandler(this.providerHandler);
+			decoratorHandler.attachProviderHandler(providerHandler);
 
 			decoratorHandler.processDecorators();
 		});
@@ -210,10 +210,13 @@ export class DecoratorHandler extends Map {
 			this.router?.use(path, router);
 		}
 	}
-	initializeProvidersOnRequest(router: Router | undefined) {
-		if (router && this.providerHandler) {
+	initializeProvidersOnRequest(
+		router: Router | undefined,
+		providerHandler: ProviderHandler
+	) {
+		if (router && providerHandler) {
 			router.use((req: Request, res: Response, next: NextFunction) => {
-				this.providerHandler?.initializeOnRequest(req, res);
+				providerHandler?.initializeOnRequest(req, res);
 				next();
 			});
 		}
@@ -228,17 +231,18 @@ export class DecoratorHandler extends Map {
 		mappings.forEach((mapping) => {
 			let controller: any;
 
-			if (this.parentProviderHandler) {
-				controller = this.parentProviderHandler.initializeWithProviderInjection(
-					this.module
-				);
-			} else {
-				controller = new this.module.prototype.constructor();
-			}
-
 			const method = async (request: Request, response: Response) => {
 				const parms = mapping.parmMethod(request, response);
 				let methodResponse: { [key: string]: any } | null = null;
+
+				if (this.providerHandler) {
+					controller = this.providerHandler.initializeWithProviderInjection(
+						this.module
+					);
+				} else {
+					controller = new this.module.prototype.constructor();
+				}
+
 				try {
 					methodResponse = await mapping.method.apply(controller, parms);
 				} catch (e) {

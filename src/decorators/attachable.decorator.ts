@@ -19,5 +19,8 @@ export function Attachable(): ClassDecorator {
 		} else {
 			constructor.prototype.decorators = [decorator];
 		}
+
+		const r = Reflect.getMetadata('design:paramtypes', constructor);
+		constructor.prototype.constructorParams = r;
 	};
 }

@@ -14,5 +14,8 @@ export function Injectable(model: ProviderModel): ClassDecorator {
 		} else {
 			constructor.prototype.decorators = [decorator];
 		}
+
+		const r = Reflect.getMetadata('design:paramtypes', constructor);
+		constructor.prototype.constructorParams = r;
 	};
 }

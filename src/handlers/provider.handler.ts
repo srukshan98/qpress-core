@@ -1,3 +1,4 @@
+import { ProviderTypeNotFoundException } from './../exceptions/provider.exception';
 import { Request, Response } from 'express';
 import { ProviderLifeSpan } from '../decorators/models/provider.model';
 
@@ -17,7 +18,7 @@ export class ProviderHandler {
 		});
 
 		Object.keys(this.providerStore).forEach((key: string) => {
-			if (this.providerList[key].type === ProviderLifeSpan.Request) {
+			if (this.providerStore[key].type === ProviderLifeSpan.Request) {
 				let obj: any;
 				if (this.parentHandler && this.parentHandler.providerList[key]) {
 					obj = this.parentHandler.providerList[key].obj;
@@ -45,7 +46,7 @@ export class ProviderHandler {
 		});
 
 		Object.keys(this.providerStore).forEach((key: string) => {
-			if (this.providerList[key].type === ProviderLifeSpan.Instant) {
+			if (this.providerStore[key].type === ProviderLifeSpan.Instant) {
 				this.providerList[key] = {
 					...this.providerStore[key],
 					obj: new this.providerStore[key].obj.prototype.constructor(),
@@ -65,6 +66,7 @@ export class ProviderHandler {
 			type: type,
 			obj: module,
 		};
+
 		if (type == ProviderLifeSpan.Application) {
 			let obj: any;
 			if (this.parentHandler && this.parentHandler.providerList[module.name]) {
@@ -83,7 +85,24 @@ export class ProviderHandler {
 	}
 
 	initializeWithProviderInjection<T>(module: Function): T {
-		const params: object[] = [];
+		this.initializeOnInstant();
+
+		const paramTupleTypes: object[][] =
+			module.prototype.constructorParams ?? [];
+
+		const params: Object[] = paramTupleTypes.map(
+			(paramType: any): Object => {
+				const obj = Object.values(this.providerList).find(
+					(v: { type: ProviderLifeSpan; obj: object }) =>
+						v.obj instanceof paramType
+				)?.obj;
+				if (obj) {
+					return obj;
+				}
+				throw new ProviderTypeNotFoundException(module.name);
+			}
+		);
+
 		return new module.prototype.constructor(...params);
 	}
 }
