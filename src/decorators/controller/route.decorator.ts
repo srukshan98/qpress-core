@@ -21,6 +21,6 @@ export function Route(path: string): ClassDecorator {
 }
 
 export function Bout(target: any) {
-  const r = Reflect.getMetadata('design:paramtypes', target);
-  target.prototype.r = r;
+	const r = Reflect.getMetadata('design:paramtypes', target);
+	target.prototype.r = r;
 }
