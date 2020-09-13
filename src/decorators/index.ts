@@ -1,4 +1,4 @@
-export { Route } from './controller/route.decorator';
+export { Route, Bout } from './controller/route.decorator';
 export { Module } from './module.decorator';
 export { Body } from './controller/body.decorator';
 export { Query } from './controller/query.decorator';
