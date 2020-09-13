@@ -83,6 +83,7 @@ export class ProviderHandler {
 	}
 
 	initializeWithProviderInjection<T>(module: Function): T {
-		return new module.prototype.constructor();
+		const params: object[] = [];
+		return new module.prototype.constructor(...params);
 	}
 }

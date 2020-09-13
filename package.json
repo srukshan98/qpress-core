@@ -65,5 +65,8 @@
   },
   "peerDependencies": {
     "body-parser": "^1.19.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
