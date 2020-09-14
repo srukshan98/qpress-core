@@ -18,6 +18,12 @@
     "type": "git",
     "url": "git://github.com/srukshan98/qpress-core.git"
   },
+  "contributors": [
+    {
+      "name": "amilakanchana0",
+      "email": "amila.kanchana79@gmail.com"
+    }
+  ],
   "keywords": [
     "express",
     "server",
@@ -26,7 +32,8 @@
   ],
   "author": {
     "name": "srukshan98",
-    "email": "sachithrukshanmail@gmail.com"
+    "email": "sachithrukshanmail@gmail.com",
+    "url": "https://github.com/srukshan98"
   },
   "license": "ISC",
   "husky": {
