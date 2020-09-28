@@ -18,6 +18,7 @@ import { NullRouteException } from '../exceptions/decorators/null-route.exceptio
 import { Middleware } from '../decorators';
 import { NullInjectableException } from '../exceptions/decorators/null-injectable.exception';
 import { InjectableDecorator } from '../decorators/models/injectable.model';
+import { doDestroy, doInitialize } from './state.handler';
 export class DecoratorHandler extends Map {
 	private router: Router | undefined;
 	private providerHandler: ProviderHandler | undefined;
@@ -232,16 +233,18 @@ export class DecoratorHandler extends Map {
 			let controller: any;
 
 			const method = async (request: Request, response: Response) => {
-				const parms = mapping.parmMethod(request, response);
-				let methodResponse: { [key: string]: any } | null = null;
-
 				if (this.providerHandler) {
 					controller = this.providerHandler.initializeWithProviderInjection(
 						this.module
 					);
 				} else {
-					controller = new this.module.prototype.constructor();
+					controller = doInitialize(this.module.prototype.constructor);
 				}
+
+				this.destroyOnSend(response, controller);
+
+				const parms = mapping.parmMethod(request, response);
+				let methodResponse: { [key: string]: any } | null = null;
 
 				try {
 					methodResponse = await mapping.method.apply(controller, parms);
@@ -276,6 +279,12 @@ export class DecoratorHandler extends Map {
 		});
 
 		this.router?.use(route.path, myRouter);
+	}
+	destroyOnSend(response: Response<any>, controller: any): void {
+		response.on('finish', () => {
+			doDestroy(controller);
+			this.providerHandler?.destroyRequestProviders();
+		});
 	}
 
 	checkRouter(): void {

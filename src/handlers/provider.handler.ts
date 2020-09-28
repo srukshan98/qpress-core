@@ -1,6 +1,7 @@
 import { ProviderTypeNotFoundException } from './../exceptions/provider.exception';
 import { Request, Response } from 'express';
 import { ProviderLifeSpan } from '../decorators/models/provider.model';
+import { doDestroy, doInitialize } from './state.handler';
 
 export class ProviderHandler {
 	providerList: { [key: string]: { type: ProviderLifeSpan; obj: object } } = {};
@@ -11,11 +12,7 @@ export class ProviderHandler {
 	constructor(private parentHandler?: ProviderHandler) {}
 
 	initializeOnRequest(req: Request, res: Response): void {
-		Object.keys(this.providerList).forEach((key: string) => {
-			if (this.providerList[key].type != ProviderLifeSpan.Application) {
-				delete this.providerList[key];
-			}
-		});
+		this.destroyRequestProviders();
 
 		Object.keys(this.providerStore).forEach((key: string) => {
 			if (this.providerStore[key].type === ProviderLifeSpan.Request) {
@@ -38,19 +35,33 @@ export class ProviderHandler {
 		});
 	}
 
-	initializeOnInstant(): void {
+	destroyRequestProviders(): void {
 		Object.keys(this.providerList).forEach((key: string) => {
-			if (this.providerList[key].type == ProviderLifeSpan.Instant) {
+			if (this.providerList[key].type != ProviderLifeSpan.Application) {
+				doDestroy(this.providerList[key].obj);
 				delete this.providerList[key];
 			}
 		});
+	}
+
+	initializeOnInstant(): void {
+		this.destroyInstantProviders();
 
 		Object.keys(this.providerStore).forEach((key: string) => {
 			if (this.providerStore[key].type === ProviderLifeSpan.Instant) {
 				this.providerList[key] = {
 					...this.providerStore[key],
-					obj: new this.providerStore[key].obj.prototype.constructor(),
+					obj: doInitialize(this.providerStore[key].obj.prototype.constructor),
 				};
+			}
+		});
+	}
+
+	private destroyInstantProviders() {
+		Object.keys(this.providerList).forEach((key: string) => {
+			if (this.providerList[key].type == ProviderLifeSpan.Instant) {
+				doDestroy(this.providerList[key].obj);
+				delete this.providerList[key];
 			}
 		});
 	}
@@ -103,6 +114,6 @@ export class ProviderHandler {
 			}
 		);
 
-		return new module.prototype.constructor(...params);
+		return doInitialize(module.prototype.constructor, params);
 	}
 }
