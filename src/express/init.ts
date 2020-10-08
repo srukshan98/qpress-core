@@ -6,7 +6,6 @@ import { AppConfig } from './consts/app-config';
 import { LogLevelType } from './types/log-level.type';
 
 export function qpress(config: AppConfig = { JsonParser: true }): QExpress {
-	print.clear();
 	const app: Express = express();
 
 	setParser(config, app);
