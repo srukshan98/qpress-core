@@ -1,8 +1,7 @@
 name: Node.js Package Lint, Test and Publish
 
 on:
-  release:
-    types: [released, prereleased]
+  create
 
 jobs:
   lint-and-test:
