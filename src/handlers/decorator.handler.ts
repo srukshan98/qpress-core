@@ -128,17 +128,9 @@ export class DecoratorHandler extends Map {
 		const middlewares: Function[] = module.module.middlewares ?? [];
 		const providers: Function[] = module.module.providers ?? [];
 
-		imports.length > 0 && print.log(imports.length, 'Imports were found');
-		controllers.length > 0 &&
-			print.log(controllers.length, 'Controllers were found');
-		middlewares.length > 0 &&
-			print.log(middlewares.length, 'Middlewares were found');
-		providers.length > 0 &&
-			print.log(middlewares.length, 'Providers were found');
-
 		let router: Router | null = null;
 		if (path) {
-			print.log('Setting Module Route to ', path);
+			print.log(`Setting ${this.module.name} Route to`, path);
 			router = Router();
 		}
 
@@ -225,7 +217,7 @@ export class DecoratorHandler extends Map {
 
 	processRoute(route: RouteDecorator): void {
 		const myRouter = Router();
-		print.log('Setting Route Path to ', route.path);
+		print.log(`Setting ${this.module.name}'s Route Path to`, route.path);
 
 		const mappings = this.getRequestMapping();
 
