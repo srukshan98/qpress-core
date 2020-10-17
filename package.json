@@ -13,9 +13,9 @@
     "watch": "tsc -w",
     "start": "npm link && nodemon",
     "tag": "git tag -a v%npm_package_version% -m \"Publish %npm_config_type% Version V%npm_package_version%\" && git push --tags",
-    "patch": "npm version patch && git tag -a v%npm_package_version% -m \"Publish Patch Version (V%npm_package_version%)\" && git push && git push --tags",
-    "minor": "npm version minor && git tag -a v%npm_package_version% -m \"Publish Minor Version (V%npm_package_version%)\" && git push && git push --tags",
-    "major": "npm version patch && git tag -a v%npm_package_version% -m \"Publish Major Version (V%npm_package_version%)\" && git push && git push --tags"
+    "patch": "npm version patch -m \"Publish Patch Version (%s)\" && git push && git push --tags",
+    "minor": "npm version minor -m \"Publish Minor Version (%s)\" && git push && git push --tags",
+    "major": "npm version patch -m \"Publish Major Version (%s)\" && git push && git push --tags"
   },
   "repository": {
     "type": "git",
