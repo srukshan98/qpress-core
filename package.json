@@ -12,10 +12,10 @@
     "build": "tsc",
     "watch": "tsc -w",
     "start": "npm link && nodemon",
-    "tag": "git tag -a v%npm_package_version% -m \"Publish %npm_config_type% Version V%npm_package_version%\" && git push --tags",
-    "patch": "npm version patch -m \"Publish Patch Version (%s)\" && git push && git push --tags",
-    "minor": "npm version minor -m \"Publish Minor Version (%s)\" && git push && git push --tags",
-    "major": "npm version patch -m \"Publish Major Version (%s)\" && git push && git push --tags"
+    "tag": "git tag -a v%npm_package_version% -m \"build: publish %npm_config_type% version V%npm_package_version%\" && git push --tags",
+    "patch": "npm version patch -m \"build: publish patch version (%s)\" && git push && git push --tags",
+    "minor": "npm version minor -m \"build: publish minor version (%s)\" && git push && git push --tags",
+    "major": "npm version patch -m \"build: publish major version (%s)\" && git push && git push --tags"
   },
   "repository": {
     "type": "git",
