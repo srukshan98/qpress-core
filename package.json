@@ -12,7 +12,11 @@
     "build": "tsc",
     "watch": "tsc -w",
     "start": "npm link && nodemon",
-    "semantic-release": "semantic-release"
+    "tag-version": "git tag -a v%npm_package_version% -m \"Publish %npm_config_type% Version V%npm_package_version%\" && git push",
+    "patch": "npm version patch && npm run tag-version --type Patch",
+    "minor": "npm version minor && npm run tag-version --type Minor",
+    "major": "npm version patch && npm run tag-version --type Major"
+
   },
   "repository": {
     "type": "git",
@@ -56,7 +60,6 @@
     "jest": "^26.4.1",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
-    "semantic-release": "^17.1.1",
     "ts-jest": "^26.2.0",
     "typescript": "^3.9.7",
     "@types/node": "^14.6.0",

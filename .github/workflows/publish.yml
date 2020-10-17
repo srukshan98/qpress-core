@@ -1,9 +1,8 @@
 name: Node.js Package Lint, Test and Publish
 
 on:
-  push:
-    branches:
-      - "master"
+  release:
+    types: [released, prereleased]
 
 jobs:
   lint-and-test:
@@ -33,11 +32,10 @@ jobs:
           registry-url: https://npm.pkg.github.com/
       - run: npm ci
       - run: npm run build --if-present
-      - run: npm run semantic-release
+      - name: publish 🚀
+      - run: npm publish
         env:
-          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
-          GH_TOKEN: ${{secrets.GH_TOKEN}}
-          CI: true
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
   # Uncomment this for a direct publish to npm
   # build-and-publish-npm:
   #   needs: build-and-publish-gpr
