@@ -1,6 +1,6 @@
 {
   "name": "@qpress/core",
-  "version": "0.1.3",
+  "version": "0.1.2",
   "description": "A Quick Express Controller Server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,10 +12,10 @@
     "build": "tsc",
     "watch": "tsc -w",
     "start": "npm link && nodemon",
-    "tag-version": "git tag -a v%npm_package_version% -m \"Publish %npm_config_type% Version V%npm_package_version%\" && git push",
-    "patch": "npm version patch && npm run tag-version --type Patch",
-    "minor": "npm version minor && npm run tag-version --type Minor",
-    "major": "npm version patch && npm run tag-version --type Major"
+    "tag": "git tag -a v%npm_package_version% -m \"Publish %npm_config_type% Version V%npm_package_version%\" && git push",
+    "patch": "npm version patch && git tag -a v%npm_package_version% -m \"Publish Patch Version (V%npm_package_version%)\" && git push",
+    "minor": "npm version minor && git tag -a v%npm_package_version% -m \"Publish Minor Version (V%npm_package_version%)\" && git push",
+    "major": "npm version patch && git tag -a v%npm_package_version% -m \"Publish Major Version (V%npm_package_version%)\" && git push"
   },
   "repository": {
     "type": "git",
